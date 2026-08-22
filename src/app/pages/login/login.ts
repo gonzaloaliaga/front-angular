@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MsalService } from '@azure/msal-angular';
 
 @Component({
   selector: 'app-login',
@@ -9,9 +10,10 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
-  iniciarSesion() {
-    console.log("Iniciando proceso de autenticación...");
-    alert("En la proxima clase lo configuraremos");
-  }
+  constructor(private msalService: MsalService) {}
 
+  iniciarSesion() {
+    console.log("Viajando a Azure AD...");
+    this.msalService.loginRedirect(); 
+  }
 }
