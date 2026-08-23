@@ -1,0 +1,19 @@
+<div style="padding: 20px;">
+  <h1>Dashboard - Pedidos 360</h1>
+  <button (click)="cerrarSesion()" style="margin-bottom: 20px; padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    Cerrar Sesión
+  </button>
+  <hr>
+
+  <!-- Esta caja SOLO existirá en el código si el usuario tiene el rol -->
+  <div *ngIf="authService.tieneRol('ventas')" style="background-color: #d4edda; padding: 15px; border-radius: 5px;">
+    <h2>🛒 Módulo de Ventas y Caja</h2>
+    <p>Bienvenido. Aquí podrás gestionar los cobros y ver el historial de pedidos.</p>
+  </div>
+
+  <!-- Esta caja será invisible para nuestro usuario prueba1 -->
+  <div *ngIf="authService.tieneRol('cocina')" style="background-color: #f8d7da; padding: 15px; border-radius: 5px; margin-top: 15px;">
+    <h2>🍳 Módulo de Cocina</h2>
+    <p>Área restringida. Solo para gestión de inventario y preparación.</p>
+  </div>
+</div>
