@@ -1,17 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../core/auth/auth';
 import { MsalService } from '@azure/msal-angular';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-layout',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  templateUrl: './layout.html',
+  styleUrl: './layout.css'
 })
 
-export class DashboardComponent {
+export class LayoutComponent {
   
   // Hacemos el servicio 'public' para que el HTML pueda hacerle preguntas directamente
   constructor(

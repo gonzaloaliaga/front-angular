@@ -22,7 +22,7 @@ export class App implements OnInit {
           // 1. Si Microsoft nos devuelve un login exitoso en este instante
           if (respuesta && respuesta.account) {
             this.msalService.instance.setActiveAccount(respuesta.account);
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/layout']);
           } 
           // 2. Si recargamos la página pero ya estábamos logueados de antes
           else {
@@ -30,9 +30,9 @@ export class App implements OnInit {
             if (cuentas.length > 0) {
               this.msalService.instance.setActiveAccount(cuentas[0]);
               
-              // Si el usuario logueado intenta ir al login por error, lo mandamos al dashboard
+              // Si el usuario logueado intenta ir al login por error, lo mandamos al layout
               if (this.router.url.includes('/login')) {
-                this.router.navigate(['/dashboard']);
+                this.router.navigate(['/layout']);
               }
             }
           }
