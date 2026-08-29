@@ -20,7 +20,7 @@ export class LayoutComponent {
 
   cerrarSesion() {
     this.msalService.logoutRedirect({
-      postLogoutRedirectUri: 'https://pedidos360.duckdns.org/login'
+      postLogoutRedirectUri: 'https://pedidos360.duckdns.org/'
     });
   }
 }
