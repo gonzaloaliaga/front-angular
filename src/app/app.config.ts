@@ -9,7 +9,7 @@ export function MSALInstanceFactory() {
     auth: {
       clientId: '0f50a8bc-f7a7-4dde-9e44-9f05fb077cc0',
       authority: 'https://login.microsoftonline.com/93cc35f5-cb03-4022-ad90-77cbe1ca3267',
-      redirectUri: 'http://localhost:4200'
+      redirectUri: window.location.origin,
     },
     cache: {
       cacheLocation: 'localStorage'
