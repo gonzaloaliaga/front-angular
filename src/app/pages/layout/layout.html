@@ -1,62 +1,60 @@
-@if (!consentAccepted()) {
-  <div class="consent-banner" role="alert" aria-live="assertive">
-    <p>Para gestionar tu carrito y sesión, necesitamos guardar cierta información mínima. ¿Aceptas nuestra política?</p>
-    <button (click)="acceptConsent()" aria-label="Aceptar política de privacidad de datos" tabindex="0">
-      Aceptar
-    </button>
-  </div>
-}
-
 <header class="main-header">
   <div class="logo-container">
-    <h1 tabindex="0">Pedidos 360</h1>
+    <h1 tabindex="0" routerLink="/layout/cliente">Pedidos 360</h1>
   </div>
 
   <nav aria-label="Navegación principal de roles">
     <ul class="nav-links">
-      <li><a routerLink="/" aria-label="Ir al catálogo principal">Inicio</a></li>
+      <!-- El catálogo público siempre está disponible -->
+      <li><a routerLink="/layout/cliente" aria-label="Ir al catálogo principal">Catálogo</a></li>
 
       @if (isLoggedIn()) {
-        @if (userRole() === 'CLIENTE') {
-          <li><a routerLink="/cliente" aria-label="Ver mis compras y estado de pedidos">Mis Compras</a></li>
+        @if (userRole() === 'cliente') {
+          <li><a routerLink="/layout/cliente" aria-label="Ver mis compras">Mis Compras</a></li>
         }
-        @if (userRole() === 'COCINA') {
-          <li><a routerLink="/cocina" aria-label="Ir a la pantalla de comandas">Panel de Cocina</a></li>
+        @if (userRole() === 'cocina') {
+          <li><a routerLink="/layout/cocina" aria-label="Pantalla de comandas">Panel de Cocina</a></li>
         }
-        @if (userRole() === 'ADMIN') {
-          <li><a routerLink="/auditoria" aria-label="Ir al registro histórico de eventos">Auditoría y Ventas</a></li>
+        @if (userRole() === 'auditoria') {
+          <li><a routerLink="/layout/auditoria" aria-label="Registro histórico">Auditoría</a></li>
+        }
+        @if (userRole() === 'despacho') {
+          <li><a routerLink="/layout/despacho" aria-label="Gestión de despachos">Despachos</a></li>
         }
       }
     </ul>
   </nav>
 
   <div class="actions-container">
-    <button class="icon-button" aria-label="Ver alertas del sistema" tabindex="0">
-      🔔
-      @if (hasUnreadAlerts()) {
-        <span class="badge" aria-hidden="true">!</span>
-      }
+    <button class="icon-button" aria-label="Ver alertas" tabindex="0">
+      🔔 @if (hasUnreadAlerts()) { <span class="badge" aria-hidden="true">!</span> }
     </button>
 
-    <button class="icon-button" aria-label="Ver carrito de compras" tabindex="0">
-      🛒
-      @if (cartCount() > 0) {
-        <span class="badge" aria-hidden="true">{{ cartCount() }}</span>
-      }
-    </button>
+    <!-- El carrito solo le importa al público o al cliente -->
+    @if (!isLoggedIn() || userRole() === 'cliente') {
+      <button class="icon-button" aria-label="Ver carrito" tabindex="0">
+        🛒 @if (cartCount() > 0) { <span class="badge" aria-hidden="true">{{ cartCount() }}</span> }
+      </button>
+    }
 
+    <!-- Botón Único de Autenticación y Vista de Perfil -->
     @if (!isLoggedIn()) {
-      <button (click)="loginMock()" aria-label="Iniciar sesión con su cuenta" tabindex="0">Iniciar Sesión</button>
+      <button (click)="loginMock()" tabindex="0">Iniciar Sesión</button>
     } @else {
-      <button (click)="logoutMock()" aria-label="Cerrar sesión segura" tabindex="0">Cerrar Sesión</button>
+      
+      @if (userRole() === 'cliente') {
+        <div class="perfil-info" tabindex="0" aria-label="Información de usuario">
+          <strong>👤 {{ perfil().nombreUsuario }}</strong>
+          <small style="display:block; font-size: 0.7rem; color: gray;">📍 {{ perfil().ubicacion }}</small>
+        </div>
+      }
+
+      <button (click)="logoutMock()" style="background-color: transparent; border: 1px solid red; color: red;" tabindex="0">Cerrar Sesión</button>
     }
   </div>
 </header>
 
+<!-- El área dinámica donde se inyecta el catálogo o las demás pantallas -->
 <main tabindex="-1">
   <router-outlet></router-outlet>
 </main>
-
-<footer>
-  <p tabindex="0">&copy; 2026 Asociación Pedidos 360. Todos los derechos reservados.</p>
-</footer>
