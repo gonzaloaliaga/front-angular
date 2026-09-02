@@ -1,33 +1,62 @@
-<div style="display: flex; height: 100vh; font-family: sans-serif;">
-  <!-- BARRA LATERAL (Sidebar) -->
-  <aside style="width: 250px; background-color: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-    <h2>Pedidos 360</h2>
-    <hr style="border-color: #34495e; width: 100%;">
-    <nav style="display: flex; flex-direction: column; gap: 10px;">
-      <!-- Módulo de Auditoría -->
-       <a *ngIf="authService.tieneRol('auditoria')" routerLink="/layout/auditoria" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        📊 Panel de Auditoría
-       </a>
-       <!-- Módulo de Cocina -->
-       <a *ngIf="authService.tieneRol('cocina')" routerLink="/layout/cocina" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        🧑‍🍳 Lista de Pedidos
-       </a>
-       <!-- Módulo de Despacho -->
-       <a *ngIf="authService.tieneRol('despacho')" routerLink="/layout/despacho" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        🚚 Rutas de Despacho
-       </a>
-       <!-- Módulo de Cliente -->
-       <a *ngIf="authService.tieneRol('cliente')" routerLink="/layout/cliente" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        📱 Realizar Pedido
-       </a>
-    </nav>
-    <!-- Botón de salida empujado hacia abajo -->
-    <button (click)="cerrarSesion()" style="margin-top: auto; padding: 10px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Cerrar Sesión
+@if (!consentAccepted()) {
+  <div class="consent-banner" role="alert" aria-live="assertive">
+    <p>Para gestionar tu carrito y sesión, necesitamos guardar cierta información mínima. ¿Aceptas nuestra política?</p>
+    <button (click)="acceptConsent()" aria-label="Aceptar política de privacidad de datos" tabindex="0">
+      Aceptar
     </button>
-  </aside>
-  <!-- ÁREA PRINCIPAL -->
-  <main style="flex: 1; padding: 30px; background-color: #f5f6fa; overflow-y: auto;">
-    <router-outlet></router-outlet>
-  </main>
-</div>
+  </div>
+}
+
+<header class="main-header">
+  <div class="logo-container">
+    <h1 tabindex="0">Pedidos 360</h1>
+  </div>
+
+  <nav aria-label="Navegación principal de roles">
+    <ul class="nav-links">
+      <li><a routerLink="/" aria-label="Ir al catálogo principal">Inicio</a></li>
+
+      @if (isLoggedIn()) {
+        @if (userRole() === 'CLIENTE') {
+          <li><a routerLink="/cliente" aria-label="Ver mis compras y estado de pedidos">Mis Compras</a></li>
+        }
+        @if (userRole() === 'COCINA') {
+          <li><a routerLink="/cocina" aria-label="Ir a la pantalla de comandas">Panel de Cocina</a></li>
+        }
+        @if (userRole() === 'ADMIN') {
+          <li><a routerLink="/auditoria" aria-label="Ir al registro histórico de eventos">Auditoría y Ventas</a></li>
+        }
+      }
+    </ul>
+  </nav>
+
+  <div class="actions-container">
+    <button class="icon-button" aria-label="Ver alertas del sistema" tabindex="0">
+      🔔
+      @if (hasUnreadAlerts()) {
+        <span class="badge" aria-hidden="true">!</span>
+      }
+    </button>
+
+    <button class="icon-button" aria-label="Ver carrito de compras" tabindex="0">
+      🛒
+      @if (cartCount() > 0) {
+        <span class="badge" aria-hidden="true">{{ cartCount() }}</span>
+      }
+    </button>
+
+    @if (!isLoggedIn()) {
+      <button (click)="loginMock()" aria-label="Iniciar sesión con su cuenta" tabindex="0">Iniciar Sesión</button>
+    } @else {
+      <button (click)="logoutMock()" aria-label="Cerrar sesión segura" tabindex="0">Cerrar Sesión</button>
+    }
+  </div>
+</header>
+
+<main tabindex="-1">
+  <router-outlet></router-outlet>
+</main>
+
+<footer>
+  <p tabindex="0">&copy; 2026 Asociación Pedidos 360. Todos los derechos reservados.</p>
+</footer>

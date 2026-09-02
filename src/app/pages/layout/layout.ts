@@ -1,26 +1,32 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink } from '@angular/router'; 
-import { AuthService } from '../../core/auth/auth';
-import { MsalService } from '@azure/msal-angular';
+import { Component, signal } from '@angular/core';
+import { RouterOutlet, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink], 
+  imports: [RouterOutlet, RouterLink],
   templateUrl: './layout.html',
-  styleUrl: './layout.css'
+  styleUrls: ['./layout.css']
 })
-export class LayoutComponent {
-  
-  constructor(
-    public authService: AuthService, 
-    private msalService: MsalService
-  ) {}
 
-  cerrarSesion() {
-    this.msalService.logoutRedirect({
-      postLogoutRedirectUri: 'https://pedidos360.duckdns.org/'
-    });
+export class LayoutComponent {
+  isLoggedIn = signal<boolean>(false);
+  userRole = signal<string>('');
+  cartCount = signal<number>(0);
+  hasUnreadAlerts = signal<boolean>(true);
+  consentAccepted = signal<boolean>(false);
+
+  acceptConsent() {
+    this.consentAccepted.set(true);
+  }
+
+  loginMock() {
+    this.isLoggedIn.set(true);
+    this.userRole.set('CLIENTE');
+  }
+
+  logoutMock() {
+    this.isLoggedIn.set(false);
+    this.userRole.set('');
   }
 }

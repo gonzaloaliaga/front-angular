@@ -6,4 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './auditoria.html',
   styleUrl: './auditoria.css',
 })
-export class Auditoria {}
+export class AuditoriaComponent {}
