@@ -1,0 +1,33 @@
+<div style="display: flex; height: 100vh; font-family: sans-serif;">
+  <!-- BARRA LATERAL (Sidebar) -->
+  <aside style="width: 250px; background-color: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+    <h2>Pedidos 360</h2>
+    <hr style="border-color: #34495e; width: 100%;">
+    <nav style="display: flex; flex-direction: column; gap: 10px;">
+      <!-- Módulo de Auditoría -->
+       <a *ngIf="authService.tieneRol('auditoria')" routerLink="/layout/auditoria" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
+        📊 Panel de Auditoría
+       </a>
+       <!-- Módulo de Cocina -->
+       <a *ngIf="authService.tieneRol('cocina')" routerLink="/layout/cocina" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
+        🧑‍🍳 Lista de Pedidos
+       </a>
+       <!-- Módulo de Despacho -->
+       <a *ngIf="authService.tieneRol('despacho')" routerLink="/layout/despacho" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
+        🚚 Rutas de Despacho
+       </a>
+       <!-- Módulo de Cliente -->
+       <a *ngIf="authService.tieneRol('cliente')" routerLink="/layout/cliente" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
+        📱 Realizar Pedido
+       </a>
+    </nav>
+    <!-- Botón de salida empujado hacia abajo -->
+    <button (click)="cerrarSesion()" style="margin-top: auto; padding: 10px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Cerrar Sesión
+    </button>
+  </aside>
+  <!-- ÁREA PRINCIPAL -->
+  <main style="flex: 1; padding: 30px; background-color: #f5f6fa; overflow-y: auto;">
+    <router-outlet></router-outlet>
+  </main>
+</div>

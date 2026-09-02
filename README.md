@@ -1,3 +1,13 @@
+Descargar versión LTS Node:
+https://nodejs.org/en/download
+
+```
+npm install
+npm install -g @angular/cli
+ng serve
+```
+
+
 # FrontAngular
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.4.

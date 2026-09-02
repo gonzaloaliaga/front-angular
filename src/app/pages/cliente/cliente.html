@@ -1,0 +1,25 @@
+<div style="padding: 20px;">
+  <h2>Realizar Pedido</h2>
+  
+  <!-- Navegación por pestañas (Accesible con TAB) -->
+  <nav style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <button tabindex="0" (click)="cambiarCategoria('Panadería')">🥐 Panadería</button>
+    <button tabindex="0" (click)="cambiarCategoria('Pastelería')">🍰 Pastelería</button>
+    <button tabindex="0" (click)="cambiarCategoria('Cafetería')">☕ Cafetería</button>
+  </nav>
+
+  <!-- Grilla de productos usando la nueva sintaxis @for -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+    
+    @for (producto of productosFiltrados(); track producto.id) {
+      <article tabindex="0" style="border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+        <h3>{{ producto.nombre }}</h3>
+        <p>${{ producto.precio }}</p>
+        <button tabindex="0">Agregar al carro</button>
+      </article>
+    } @empty {
+      <p>No hay productos en esta categoría.</p>
+    }
+
+  </div>
+</div>
