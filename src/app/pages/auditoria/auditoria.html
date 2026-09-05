@@ -1,1 +1,56 @@
-<p>auditoria works!</p>
+<div class="max-w-5xl mx-auto px-5 py-8">
+  <h1 tabindex="0" class="font-display text-2xl text-crust mb-6">Supervisión y auditoría</h1>
+
+  <!-- KPIs -->
+  <div class="grid sm:grid-cols-3 gap-4 mb-10">
+    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Ventas totales</p>
+      <p class="font-display text-2xl text-crust">${{ store.ventasHoy() | number }}</p>
+    </div>
+    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Pedidos registrados</p>
+      <p class="font-display text-2xl text-crust">{{ store.pedidos().length }}</p>
+    </div>
+    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Entregados</p>
+      <p class="font-display text-2xl text-crust">{{ store.entregados().length }}</p>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-10">
+    <!-- Ventas por local -->
+    <section aria-labelledby="ventas-local">
+      <h2 id="ventas-local" tabindex="0" class="font-display text-lg text-crust mb-4">Ventas por local</h2>
+      <div class="space-y-3">
+        @for (fila of store.pedidosPorLocal(); track fila.local) {
+          <div tabindex="0">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-crust font-medium">{{ fila.local }}</span>
+              <span class="text-cocoa">${{ fila.total | number }}</span>
+            </div>
+            <div class="h-2 bg-cocoa/10 rounded-full overflow-hidden">
+              <div class="h-full bg-wheat" [style.width.%]="(fila.total / maxVentaLocal()) * 100"></div>
+            </div>
+          </div>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">Todavía no hay ventas registradas.</p>
+        }
+      </div>
+    </section>
+
+    <!-- Notificaciones / trazabilidad -->
+    <section aria-labelledby="notificaciones">
+      <h2 id="notificaciones" tabindex="0" class="font-display text-lg text-crust mb-4">Registro de eventos</h2>
+      <ul class="space-y-3">
+        @for (evento of store.eventos(); track evento.id) {
+          <li tabindex="0" class="text-sm border-l-2 border-wheat pl-3">
+            <p class="text-crust">{{ evento.descripcion }}</p>
+            <p class="text-xs text-cocoa">{{ evento.fecha | date:'short' }} · rol: {{ evento.rol }}</p>
+          </li>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">Sin eventos registrados todavía.</p>
+        }
+      </ul>
+    </section>
+  </div>
+</div>

@@ -1,60 +1,68 @@
-<header class="main-header">
-  <div class="logo-container">
-    <h1 tabindex="0" routerLink="/layout/cliente">Pedidos 360</h1>
-  </div>
-
-  <nav aria-label="Navegación principal de roles">
-    <ul class="nav-links">
-      <!-- El catálogo público siempre está disponible -->
-      <li><a routerLink="/layout/cliente" aria-label="Ir al catálogo principal">Catálogo</a></li>
-
-      @if (isLoggedIn()) {
-        @if (userRole() === 'cliente') {
-          <li><a routerLink="/layout/cliente" aria-label="Ver mis compras">Mis Compras</a></li>
-        }
-        @if (userRole() === 'cocina') {
-          <li><a routerLink="/layout/cocina" aria-label="Pantalla de comandas">Panel de Cocina</a></li>
-        }
-        @if (userRole() === 'auditoria') {
-          <li><a routerLink="/layout/auditoria" aria-label="Registro histórico">Auditoría</a></li>
-        }
-        @if (userRole() === 'despacho') {
-          <li><a routerLink="/layout/despacho" aria-label="Gestión de despachos">Despachos</a></li>
-        }
-      }
-    </ul>
-  </nav>
-
-  <div class="actions-container">
-    <button class="icon-button" aria-label="Ver alertas" tabindex="0">
-      🔔 @if (hasUnreadAlerts()) { <span class="badge" aria-hidden="true">!</span> }
+@if (!consentAccepted()) {
+  <div class="bg-crust text-dough px-6 py-3 flex flex-wrap items-center justify-center gap-4 text-sm relative z-50" role="region" aria-label="Aviso de privacidad">
+    <p tabindex="0" class="max-w-2xl">
+      Solo guardamos tu nombre, correo y el detalle de tus pedidos para poder atenderte. Nada más.
+    </p>
+    <button
+      (click)="acceptConsent()"
+      tabindex="0"
+      class="bg-wheat text-crust font-semibold px-4 py-1.5 rounded-full hover:bg-wheat-dark focus:outline focus:outline-2 focus:outline-dough transition-colors">
+      Entendido
     </button>
+  </div>
+}
 
-    <!-- El carrito solo le importa al público o al cliente -->
-    @if (!isLoggedIn() || userRole() === 'cliente') {
-      <button class="icon-button" aria-label="Ver carrito" tabindex="0">
-        🛒 @if (cartCount() > 0) { <span class="badge" aria-hidden="true">{{ cartCount() }}</span> }
-      </button>
-    }
+<header class="sticky top-0 z-40 bg-cream-card border-b border-cocoa/15">
+  <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+    <a routerLink="/layout/cliente" tabindex="0" class="font-display text-xl font-semibold text-crust shrink-0">
+      Pedidos 360
+    </a>
 
-    <!-- Botón Único de Autenticación y Vista de Perfil -->
-    @if (!isLoggedIn()) {
-      <button (click)="loginMock()" tabindex="0">Iniciar Sesión</button>
-    } @else {
-      
-      @if (userRole() === 'cliente') {
-        <div class="perfil-info" tabindex="0" aria-label="Información de usuario">
-          <strong>👤 {{ perfil().nombreUsuario }}</strong>
-          <small style="display:block; font-size: 0.7rem; color: gray;">📍 {{ perfil().ubicacion }}</small>
-        </div>
+    <nav aria-label="Navegación principal" class="hidden sm:block">
+      <a
+        [routerLink]="'/layout/' + (rol() ?? 'cliente')"
+        tabindex="0"
+        class="text-sm font-medium text-cocoa hover:text-crust border-b-2 border-transparent hover:border-wheat focus:border-wheat pb-1 transition-colors">
+        {{ etiquetaRol() }}
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      @if (rol() === 'cliente') {
+        <button aria-label="Ver alertas" tabindex="0" class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
+          <span aria-hidden="true">🔔</span>
+          @if (hasUnreadAlerts()) {
+            <span class="absolute -top-0.5 -right-0.5 bg-jam text-white text-[10px] leading-none rounded-full px-1.5 py-1" aria-hidden="true">!</span>
+          }
+        </button>
+
+        <a routerLink="/layout/cliente" aria-label="Ver carrito" tabindex="0" class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
+          <span aria-hidden="true">🛒</span>
+          @if (cartCount() > 0) {
+            <span class="absolute -top-0.5 -right-0.5 bg-jam text-white text-[10px] leading-none rounded-full px-1.5 py-1" aria-hidden="true">{{ cartCount() }}</span>
+          }
+        </a>
       }
 
-      <button (click)="logoutMock()" style="background-color: transparent; border: 1px solid red; color: red;" tabindex="0">Cerrar Sesión</button>
-    }
+      <div class="hidden md:block text-right leading-tight" tabindex="0" aria-label="Sesión iniciada como">
+        <strong class="block text-sm text-crust">{{ nombre() }}</strong>
+        <small class="text-xs text-cocoa">{{ etiquetaRol() }}</small>
+      </div>
+
+      <button
+        (click)="cerrarSesion()"
+        tabindex="0"
+        class="text-sm font-medium border border-jam text-jam px-3 py-1.5 rounded-full hover:bg-jam hover:text-white focus:outline focus:outline-2 focus:outline-jam transition-colors">
+        Cerrar sesión
+      </button>
+    </div>
   </div>
 </header>
 
-<!-- El área dinámica donde se inyecta el catálogo o las demás pantallas -->
-<main tabindex="-1">
+<main tabindex="-1" class="min-h-[70vh] bg-dough">
   <router-outlet></router-outlet>
 </main>
+
+<footer class="bg-crust text-dough/80 text-center py-6 text-sm">
+  <p tabindex="0">Pedidos 360 · Asociación de panaderías, pastelerías y cafeterías</p>
+</footer>

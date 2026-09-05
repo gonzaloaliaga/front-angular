@@ -1,1 +1,50 @@
-<p>despacho works!</p>
+<div class="max-w-4xl mx-auto px-5 py-8">
+  <h1 tabindex="0" class="font-display text-2xl text-crust mb-6">Panel de despacho</h1>
+
+  <section aria-labelledby="col-listos" class="mb-10">
+    <h2 id="col-listos" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
+      Listos para entregar ({{ store.listosParaDespacho().length }})
+    </h2>
+    <div class="space-y-3">
+      @for (pedido of store.listosParaDespacho(); track pedido.id) {
+        <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ pedido.cliente }}</p>
+            <p class="text-xs text-cocoa">
+              {{ pedido.local }} ·
+              <span class="font-semibold" [class]="pedido.modalidad === 'Despacho a domicilio' ? 'text-jam' : 'text-cocoa'">
+                {{ pedido.modalidad }}
+              </span>
+              @if (pedido.direccion) { · {{ pedido.direccion }} }
+            </p>
+          </div>
+          <button
+            (click)="entregar(pedido.id)"
+            tabindex="0"
+            [attr.aria-label]="'Marcar pedido ' + pedido.id + ' como entregado'"
+            class="bg-wheat text-crust font-semibold text-sm px-4 py-2 rounded-full hover:bg-wheat-dark focus:outline focus:outline-2 focus:outline-crust transition-colors">
+            Entregar pedido
+          </button>
+        </article>
+      } @empty {
+        <p tabindex="0" class="text-sm text-cocoa">No hay pedidos esperando entrega.</p>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="col-entregados">
+    <h2 id="col-entregados" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
+      Entregados hoy ({{ store.entregados().length }})
+    </h2>
+    <div class="space-y-2">
+      @for (pedido of store.entregados(); track pedido.id) {
+        <article tabindex="0" class="text-sm text-cocoa flex items-center justify-between border-b border-cocoa/10 pb-2">
+          <span>Pedido #{{ pedido.id }} · {{ pedido.cliente }}</span>
+          <span>{{ pedido.creadoEn | date:'shortTime' }}</span>
+        </article>
+      } @empty {
+        <p tabindex="0" class="text-sm text-cocoa">Aún no hay entregas registradas.</p>
+      }
+    </div>
+  </section>
+</div>

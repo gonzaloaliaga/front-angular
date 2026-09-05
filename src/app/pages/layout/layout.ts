@@ -1,5 +1,9 @@
-import { Component, signal, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { AuthService } from '../../core/auth/auth';
+import { CarritoService } from '../../core/carrito/carrito';
+
+const CLAVE_CONSENTIMIENTO = 'pedidos360_consentimiento';
 
 @Component({
   selector: 'app-layout',
@@ -8,45 +12,35 @@ import { RouterOutlet, RouterLink, Router } from '@angular/router';
   templateUrl: './layout.html',
   styleUrls: ['./layout.css']
 })
-
 export class LayoutComponent {
-  router = inject(Router);
-  isLoggedIn = signal<boolean>(false);
-  userRole = signal<string>(''); 
-  cartCount = signal<number>(0);
+  private authService = inject(AuthService);
+  private carritoService = inject(CarritoService);
+
+  // Si llegamos aquí, MsalGuard ya garantizó que hay sesión activa.
+  rol = signal(this.authService.rolActual());
+  nombre = signal(this.authService.obtenerNombre());
+  correo = signal(this.authService.obtenerCorreo());
+
+  cartCount = this.carritoService.cantidadTotal;
   hasUnreadAlerts = signal<boolean>(true);
-  consentAccepted = signal<boolean>(false);
-  perfil = signal({
-    correo: 'm4tykrsty@pedidos360.cl',
-    nombreUsuario: '',
-    alias: 'MatyCrsty',
-    ubicacion: 'La Florida, Santiago'
+  consentAccepted = signal<boolean>(!!localStorage.getItem(CLAVE_CONSENTIMIENTO));
+
+  etiquetaRol = computed(() => {
+    switch (this.rol()) {
+      case 'cocina': return 'Panel de Cocina';
+      case 'despacho': return 'Panel de Despacho';
+      case 'auditoria': return 'Panel de Auditoría';
+      default: return 'Catálogo';
+    }
   });
 
-  acceptConsent() {
+  acceptConsent(): void {
+    // Guardamos solo lo mínimo: que aceptó, y cuándo. Nada de datos personales extra.
+    localStorage.setItem(CLAVE_CONSENTIMIENTO, new Date().toISOString());
     this.consentAccepted.set(true);
   }
 
-  loginMock() {
-    const rolDeAzure: string = 'cliente'; 
-    this.isLoggedIn.set(true);
-    this.userRole.set(rolDeAzure);
-    const extraido = this.perfil().correo.split('@')[0];
-    this.perfil.update(p => ({ ...p, nombreUsuario: extraido }));
-    if (rolDeAzure === 'cocina') {
-      this.router.navigate(['/layout/cocina']);
-    } else if (rolDeAzure === 'auditoria') {
-      this.router.navigate(['/layout/auditoria']);
-    } else if (rolDeAzure === 'despacho') {
-      this.router.navigate(['/layout/despacho']);
-    } else {
-      this.router.navigate(['/layout/cliente']);
-    }
-  }
-
-  logoutMock() {
-    this.isLoggedIn.set(false);
-    this.userRole.set('');
-    this.router.navigate(['/layout/cliente']); 
+  cerrarSesion(): void {
+    this.authService.cerrarSesion();
   }
 }

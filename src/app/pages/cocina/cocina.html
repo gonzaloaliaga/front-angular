@@ -1,1 +1,79 @@
-<p>cocina works!</p>
+<div class="max-w-6xl mx-auto px-5 py-8">
+  <h1 tabindex="0" class="font-display text-2xl text-crust mb-6">Pantalla de cocina</h1>
+
+  <div class="grid md:grid-cols-3 gap-5">
+
+    <!-- Pendientes -->
+    <section aria-labelledby="col-pendientes">
+      <h2 id="col-pendientes" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
+        Pendientes ({{ store.pendientes().length }})
+      </h2>
+      <div class="space-y-3">
+        @for (pedido of store.pendientes(); track pedido.id) {
+          <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4">
+            <p class="font-medium text-crust">Pedido #{{ pedido.id }}</p>
+            <p class="text-xs text-cocoa mb-2">{{ pedido.creadoEn | date:'shortTime' }} · {{ pedido.local }}</p>
+            <ul class="text-sm text-crust mb-3 list-disc list-inside">
+              @for (item of pedido.items; track item.productoId) {
+                <li>{{ item.cantidad }}× {{ item.nombre }}</li>
+              }
+            </ul>
+            <button
+              (click)="iniciarPreparacion(pedido.id)"
+              tabindex="0"
+              class="w-full bg-wheat text-crust font-semibold text-sm py-2 rounded-full hover:bg-wheat-dark focus:outline focus:outline-2 focus:outline-crust transition-colors">
+              Empezar preparación
+            </button>
+          </article>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">No hay pedidos pendientes.</p>
+        }
+      </div>
+    </section>
+
+    <!-- En preparación -->
+    <section aria-labelledby="col-preparacion">
+      <h2 id="col-preparacion" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
+        En preparación ({{ store.enPreparacion().length }})
+      </h2>
+      <div class="space-y-3">
+        @for (pedido of store.enPreparacion(); track pedido.id) {
+          <article tabindex="0" class="bg-cream-card border border-wheat rounded-2xl p-4">
+            <p class="font-medium text-crust">Pedido #{{ pedido.id }}</p>
+            <p class="text-xs text-cocoa mb-2">{{ pedido.creadoEn | date:'shortTime' }} · {{ pedido.local }}</p>
+            <ul class="text-sm text-crust mb-3 list-disc list-inside">
+              @for (item of pedido.items; track item.productoId) {
+                <li>{{ item.cantidad }}× {{ item.nombre }}</li>
+              }
+            </ul>
+            <button
+              (click)="marcarHecho(pedido.id)"
+              tabindex="0"
+              class="w-full bg-crust text-dough font-semibold text-sm py-2 rounded-full hover:bg-cocoa focus:outline focus:outline-2 focus:outline-wheat transition-colors">
+              Marcar como hecho
+            </button>
+          </article>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">Nada en preparación.</p>
+        }
+      </div>
+    </section>
+
+    <!-- Hechos -->
+    <section aria-labelledby="col-hechos">
+      <h2 id="col-hechos" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
+        Listos para despacho ({{ store.hechos().length }})
+      </h2>
+      <div class="space-y-3">
+        @for (pedido of store.hechos(); track pedido.id) {
+          <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 opacity-80">
+            <p class="font-medium text-crust">Pedido #{{ pedido.id }}</p>
+            <p class="text-xs text-cocoa">{{ pedido.local }} · Esperando retiro/despacho</p>
+          </article>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">Nada listo todavía.</p>
+        }
+      </div>
+    </section>
+  </div>
+</div>
