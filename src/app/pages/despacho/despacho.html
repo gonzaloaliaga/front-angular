@@ -1,21 +1,30 @@
 <div class="max-w-4xl mx-auto px-5 py-8">
-  <h1 tabindex="0" class="font-display text-2xl text-crust mb-6">Panel de despacho</h1>
+  <div class="flex items-center justify-between mb-6">
+    <h1 tabindex="0" class="font-display text-2xl text-crust">Panel de despacho</h1>
+    <button (click)="cargar()" tabindex="0" class="text-sm font-medium border border-cocoa/20 text-cocoa px-3 py-1.5 rounded-full hover:border-wheat hover:text-crust focus:outline focus:outline-2 focus:outline-wheat">
+      Actualizar
+    </button>
+  </div>
+
+  @if (errorCarga()) {
+    <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorCarga() }}</div>
+  }
 
   <section aria-labelledby="col-listos" class="mb-10">
     <h2 id="col-listos" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
-      Listos para entregar ({{ store.listosParaDespacho().length }})
+      Listos para entregar ({{ listosParaDespacho().length }})
     </h2>
     <div class="space-y-3">
-      @for (pedido of store.listosParaDespacho(); track pedido.id) {
+      @for (pedido of listosParaDespacho(); track pedido.id) {
         <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ pedido.cliente }}</p>
+            <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ pedido.clienteNombre }}</p>
             <p class="text-xs text-cocoa">
-              {{ pedido.local }} ·
+              Local {{ pedido.localId }} ·
               <span class="font-semibold" [class]="pedido.modalidad === 'Despacho a domicilio' ? 'text-jam' : 'text-cocoa'">
                 {{ pedido.modalidad }}
               </span>
-              @if (pedido.direccion) { · {{ pedido.direccion }} }
+              @if (pedido.direccionDespacho) { · {{ pedido.direccionDespacho }} }
             </p>
           </div>
           <button
@@ -34,12 +43,12 @@
 
   <section aria-labelledby="col-entregados">
     <h2 id="col-entregados" tabindex="0" class="text-sm font-semibold text-cocoa uppercase tracking-wide mb-3">
-      Entregados hoy ({{ store.entregados().length }})
+      Entregados hoy ({{ entregados().length }})
     </h2>
     <div class="space-y-2">
-      @for (pedido of store.entregados(); track pedido.id) {
+      @for (pedido of entregados(); track pedido.id) {
         <article tabindex="0" class="text-sm text-cocoa flex items-center justify-between border-b border-cocoa/10 pb-2">
-          <span>Pedido #{{ pedido.id }} · {{ pedido.cliente }}</span>
+          <span>Pedido #{{ pedido.id }} · {{ pedido.clienteNombre }}</span>
           <span>{{ pedido.creadoEn | date:'shortTime' }}</span>
         </article>
       } @empty {

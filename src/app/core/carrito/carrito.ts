@@ -9,6 +9,7 @@ export interface Producto {
   imagenUrl: string;
   categoria: string;
   local: string;
+  localId: number;
 }
 
 export interface LineaCarrito {

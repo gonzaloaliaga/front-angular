@@ -1,5 +1,6 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
 import { MsalModule, MsalService, MsalGuard, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MsalGuardConfiguration } from '@azure/msal-angular';
 import { PublicClientApplication, InteractionType } from '@azure/msal-browser';
@@ -30,6 +31,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
+    provideHttpClient(),
     importProvidersFrom(MsalModule),
     {
       provide: MSAL_INSTANCE,

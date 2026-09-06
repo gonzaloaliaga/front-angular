@@ -22,7 +22,17 @@
     </button>
   </div>
 
-  @if (vista() === 'catalogo') {
+  @if (errorCarga()) {
+    <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">
+      {{ errorCarga() }}
+    </div>
+  }
+
+  @if (cargando()) {
+    <p tabindex="0" class="text-cocoa text-sm mb-6">Cargando catálogo…</p>
+  }
+
+  @if (vista() === 'catalogo' && !cargando() && !errorCarga()) {
     <div class="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
 
       <!-- Catálogo -->
@@ -127,6 +137,10 @@
             }
           </fieldset>
 
+          @if (errorConfirmacion()) {
+            <p class="text-jam text-xs mb-3" tabindex="0" role="alert">{{ errorConfirmacion() }}</p>
+          }
+
           <button
             (click)="confirmarPedido()"
             tabindex="0"
@@ -158,7 +172,7 @@
           @for (pedido of misPedidos(); track pedido.id) {
             <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
               <div>
-                <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ pedido.local }}</p>
+                <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ nombreLocalPorId().get(pedido.localId) ?? ('Local ' + pedido.localId) }}</p>
                 <p class="text-xs text-cocoa">{{ pedido.creadoEn | date:'short' }} · {{ pedido.modalidad }}</p>
               </div>
               <div class="flex items-center gap-3">
