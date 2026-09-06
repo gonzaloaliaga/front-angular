@@ -14,16 +14,6 @@ export class PedidosStore {
   private _pedidos = signal<Pedido[]>([
     {
       id: 1001,
-      cliente: 'Javiera Muñoz',
-      local: 'Pan Artesanal',
-      items: [{ productoId: 1, nombre: 'Empanada de Pino', cantidad: 4, precioUnitario: 2500 }],
-      total: 10000,
-      modalidad: 'Retiro en tienda',
-      estado: 'Pendiente',
-      creadoEn: new Date(Date.now() - 1000 * 60 * 6)
-    },
-    {
-      id: 1002,
       cliente: 'Bastián Rojas',
       local: 'Café Central',
       items: [{ productoId: 3, nombre: 'Café Americano', cantidad: 2, precioUnitario: 1800 }],
@@ -34,7 +24,7 @@ export class PedidosStore {
       creadoEn: new Date(Date.now() - 1000 * 60 * 18)
     },
     {
-      id: 1003,
+      id: 1002,
       cliente: 'Fernanda Castro',
       local: 'Dulce Trigo',
       items: [{ productoId: 2, nombre: 'Torta Tres Leches', cantidad: 1, precioUnitario: 18900 }],

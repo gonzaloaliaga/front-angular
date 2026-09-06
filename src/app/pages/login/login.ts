@@ -18,8 +18,7 @@ export class LoginComponent {
   categorias = [
     { nombre: 'Panadería', emoji: '🥖' },
     { nombre: 'Pastelería', emoji: '🎂' },
-    { nombre: 'Cafetería', emoji: '☕' },
-    { nombre: 'Empanadas', emoji: '🥟' }
+    { nombre: 'Cafetería', emoji: '☕' }
   ];
 
   constructor(private msalService: MsalService) {}
