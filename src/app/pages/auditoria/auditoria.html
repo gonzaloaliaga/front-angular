@@ -1,1 +1,65 @@
-<p>auditoria works!</p>
+<div class="max-w-5xl mx-auto px-5 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 tabindex="0" class="font-display text-2xl text-crust">Supervisión y auditoría</h1>
+    <button (click)="cargar()" tabindex="0" class="text-sm font-medium border border-cocoa/20 text-cocoa px-3 py-1.5 rounded-full hover:border-wheat hover:text-crust focus:outline focus:outline-2 focus:outline-wheat">
+      Actualizar
+    </button>
+  </div>
+
+  @if (errorCarga()) {
+    <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorCarga() }}</div>
+  }
+
+  <!-- KPIs -->
+  <div class="grid sm:grid-cols-3 gap-4 mb-10">
+    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Ventas totales</p>
+      <p class="font-display text-2xl text-crust">${{ resumen()?.ventasTotales ?? 0 | number }}</p>
+    </div>
+    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Pedidos registrados</p>
+      <p class="font-display text-2xl text-crust">{{ resumen()?.totalPedidos ?? 0 }}</p>
+    </div>
+    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Entregados</p>
+      <p class="font-display text-2xl text-crust">{{ resumen()?.totalEntregados ?? 0 }}</p>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-10">
+    <!-- Ventas por local -->
+    <section aria-labelledby="ventas-local">
+      <h2 id="ventas-local" tabindex="0" class="font-display text-lg text-crust mb-4">Ventas por local</h2>
+      <div class="space-y-3">
+        @for (fila of resumen()?.porLocal ?? []; track fila.localId) {
+          <div tabindex="0">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-crust font-medium">{{ nombreLocalPorId().get(fila.localId) ?? ('Local ' + fila.localId) }}</span>
+              <span class="text-cocoa">${{ fila.total | number }}</span>
+            </div>
+            <div class="h-2 bg-cocoa/10 rounded-full overflow-hidden">
+              <div class="h-full bg-wheat" [style.width.%]="(fila.total / maxVentaLocal()) * 100"></div>
+            </div>
+          </div>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">Todavía no hay ventas registradas.</p>
+        }
+      </div>
+    </section>
+
+    <!-- Notificaciones / trazabilidad -->
+    <section aria-labelledby="notificaciones">
+      <h2 id="notificaciones" tabindex="0" class="font-display text-lg text-crust mb-4">Registro de eventos</h2>
+      <ul class="space-y-3">
+        @for (evento of eventos(); track evento.id) {
+          <li tabindex="0" class="text-sm border-l-2 border-wheat pl-3">
+            <p class="text-crust">{{ evento.descripcion }}</p>
+            <p class="text-xs text-cocoa">{{ evento.fecha | date:'short' }} · rol: {{ evento.rol }}</p>
+          </li>
+        } @empty {
+          <p tabindex="0" class="text-sm text-cocoa">Sin eventos registrados todavía.</p>
+        }
+      </ul>
+    </section>
+  </div>
+</div>

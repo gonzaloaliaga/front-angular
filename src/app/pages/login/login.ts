@@ -10,10 +10,20 @@ import { MsalService } from '@azure/msal-angular';
 })
 export class LoginComponent {
 
+  locales = [
+    'Pan Artesanal', 'Café Central', 'Dulce Trigo', 'La Espiga',
+    'Horno de Barrio', 'Aroma & Miga', 'Mesón del Café', 'Trigal Norte'
+  ];
+
+  categorias = [
+    { nombre: 'Panadería', emoji: '🥖' },
+    { nombre: 'Pastelería', emoji: '🎂' },
+    { nombre: 'Cafetería', emoji: '☕' }
+  ];
+
   constructor(private msalService: MsalService) {}
 
   iniciarSesion() {
-    console.log("Viajando a Azure AD...");
-    this.msalService.loginRedirect(); 
+    this.msalService.loginRedirect();
   }
 }

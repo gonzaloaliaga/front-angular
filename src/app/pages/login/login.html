@@ -1,17 +1,116 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="brand-section">
-      <h1>Pedidos 360</h1>
-      <p>Plataforma unificada</p>
-    </div>
-    
-    <div class="action-section">
-      <p class="instruction">Ingresa con tu cuenta corporativa de Azure</p>
-      
-      <button class="ms-btn" (click)="iniciarSesion()">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="MS Logo" class="ms-logo">
-        Iniciar sesión con Microsoft
+<div class="min-h-screen bg-dough flex flex-col">
+
+  <!-- Nav -->
+  <header class="sticky top-0 z-40 bg-cream-card/95 backdrop-blur border-b border-cocoa/15">
+    <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+      <span class="font-display text-xl font-semibold text-crust">Pedidos 360</span>
+      <nav aria-label="Navegación de la página principal" class="hidden md:flex items-center gap-8 text-sm font-medium text-cocoa">
+        <a href="#como-funciona" tabindex="0" class="hover:text-crust">Cómo funciona</a>
+        <a href="#locales" tabindex="0" class="hover:text-crust">Locales asociados</a>
+        <a href="#categorias" tabindex="0" class="hover:text-crust">Categorías</a>
+      </nav>
+      <button
+        (click)="iniciarSesion()"
+        tabindex="0"
+        class="bg-wheat text-crust font-semibold text-sm px-4 py-2 rounded-full hover:bg-wheat-dark focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-crust transition-colors">
+        Iniciar sesión
       </button>
     </div>
-  </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="max-w-6xl w-full mx-auto px-5 pt-14 pb-10 grid md:grid-cols-2 gap-10 items-center">
+    <div>
+      <h1 tabindex="0" class="font-display text-4xl sm:text-5xl leading-[1.1] text-crust">
+        Todo lo que hornea tu barrio,<br class="hidden sm:block" /> en un solo pedido.
+      </h1>
+      <p tabindex="0" class="mt-5 text-cocoa text-lg max-w-md">
+        20 panaderías, pastelerías y cafeterías independientes, unidas en una sola plataforma
+        para pedir, seguir y recibir tus pedidos sin dar vueltas.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3">
+        <button
+          (click)="iniciarSesion()"
+          tabindex="0"
+          class="inline-flex items-center justify-center gap-3 bg-crust text-dough font-semibold px-5 py-3 rounded-full hover:bg-cocoa focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-wheat transition-colors">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="" class="w-4 h-4" aria-hidden="true">
+          Iniciar sesión con Microsoft
+        </button>
+      </div>
+      <p tabindex="0" class="mt-3 text-xs text-cocoa">
+        Usa tu cuenta corporativa Pedidos 360 (Azure AD).
+      </p>
+    </div>
+
+    <div class="hidden md:block" aria-hidden="true">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="rounded-3xl overflow-hidden aspect-square translate-y-6">
+          <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=500&q=80" alt="">
+        </div>
+        <div class="rounded-3xl overflow-hidden aspect-square">
+          <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=500&q=80" alt="">
+        </div>
+        <div class="rounded-3xl overflow-hidden aspect-square">
+          <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?auto=format&fit=crop&w=500&q=80" alt="">
+        </div>
+        <div class="rounded-3xl overflow-hidden aspect-square translate-y-6">
+          <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=500&q=80" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Locales asociados -->
+  <section id="locales" class="py-8 border-y border-cocoa/15 bg-cream-card">
+    <div class="max-w-6xl mx-auto px-5">
+      <p tabindex="0" class="text-xs font-semibold tracking-wide text-cocoa mb-4">Algunos de nuestros 20 locales asociados</p>
+      <div class="flex gap-3 overflow-x-auto scroll-fino pb-2">
+        @for (local of locales; track local) {
+          <span tabindex="0" class="shrink-0 bg-dough text-crust text-sm font-medium px-4 py-2 rounded-full border border-cocoa/15">
+            {{ local }}
+          </span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo funciona -->
+  <section id="como-funciona" class="max-w-6xl mx-auto px-5 py-14">
+    <h2 tabindex="0" class="font-display text-2xl text-crust mb-8">Cómo funciona</h2>
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div tabindex="0" class="bg-cream-card rounded-2xl p-6 border border-cocoa/10">
+        <p class="font-display text-lg text-crust mb-2">Pides en línea</p>
+        <p class="text-sm text-cocoa">Eliges productos de cualquier local asociado y decides si retiras en tienda o pides despacho.</p>
+      </div>
+      <div tabindex="0" class="bg-cream-card rounded-2xl p-6 border border-cocoa/10">
+        <p class="font-display text-lg text-crust mb-2">La cocina lo recibe al instante</p>
+        <p class="text-sm text-cocoa">Tu pedido llega directo a la pantalla de la cocina del local, sin llamadas ni papeles.</p>
+      </div>
+      <div tabindex="0" class="bg-cream-card rounded-2xl p-6 border border-cocoa/10">
+        <p class="font-display text-lg text-crust mb-2">Sigues el estado en vivo</p>
+        <p class="text-sm text-cocoa">Sabes si está en preparación, listo o entregado, desde tu cuenta.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categorías -->
+  <section id="categorias" class="max-w-6xl mx-auto px-5 pb-16">
+    <h2 tabindex="0" class="font-display text-2xl text-crust mb-8">Categorías</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      @for (cat of categorias; track cat.nombre) {
+        <button
+          (click)="iniciarSesion()"
+          tabindex="0"
+          [attr.aria-label]="'Iniciar sesión para ver ' + cat.nombre"
+          class="bg-cream-card border border-cocoa/10 rounded-2xl p-6 text-left hover:border-wheat focus:outline focus:outline-2 focus:outline-wheat transition-colors">
+          <span class="text-2xl" aria-hidden="true">{{ cat.emoji }}</span>
+          <p class="mt-3 font-medium text-crust">{{ cat.nombre }}</p>
+        </button>
+      }
+    </div>
+  </section>
+
+  <footer class="bg-crust text-dough/80 text-center py-6 text-sm mt-auto">
+    <p tabindex="0">Pedidos 360 · Asociación de panaderías, pastelerías y cafeterías</p>
+  </footer>
 </div>

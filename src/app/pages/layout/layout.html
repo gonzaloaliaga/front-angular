@@ -1,33 +1,68 @@
-<div style="display: flex; height: 100vh; font-family: sans-serif;">
-  <!-- BARRA LATERAL (Sidebar) -->
-  <aside style="width: 250px; background-color: #2c3e50; color: white; padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-    <h2>Pedidos 360</h2>
-    <hr style="border-color: #34495e; width: 100%;">
-    <nav style="display: flex; flex-direction: column; gap: 10px;">
-      <!-- Módulo de Auditoría -->
-       <a *ngIf="authService.tieneRol('auditoria')" routerLink="/layout/auditoria" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        📊 Panel de Auditoría
-       </a>
-       <!-- Módulo de Cocina -->
-       <a *ngIf="authService.tieneRol('cocina')" routerLink="/layout/cocina" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        🧑‍🍳 Lista de Pedidos
-       </a>
-       <!-- Módulo de Despacho -->
-       <a *ngIf="authService.tieneRol('despacho')" routerLink="/layout/despacho" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        🚚 Rutas de Despacho
-       </a>
-       <!-- Módulo de Cliente -->
-       <a *ngIf="authService.tieneRol('cliente')" routerLink="/layout/cliente" style="color: white; text-decoration: none; padding: 10px; border-radius: 4px; border: 1px solid #34495e;">
-        📱 Realizar Pedido
-       </a>
-    </nav>
-    <!-- Botón de salida empujado hacia abajo -->
-    <button (click)="cerrarSesion()" style="margin-top: auto; padding: 10px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">
-      Cerrar Sesión
+@if (!consentAccepted()) {
+  <div class="bg-crust text-dough px-6 py-3 flex flex-wrap items-center justify-center gap-4 text-sm relative z-50" role="region" aria-label="Aviso de privacidad">
+    <p tabindex="0" class="max-w-2xl">
+      Solo guardamos tu nombre, correo y el detalle de tus pedidos para poder atenderte. Nada más.
+    </p>
+    <button
+      (click)="acceptConsent()"
+      tabindex="0"
+      class="bg-wheat text-crust font-semibold px-4 py-1.5 rounded-full hover:bg-wheat-dark focus:outline focus:outline-2 focus:outline-dough transition-colors">
+      Entendido
     </button>
-  </aside>
-  <!-- ÁREA PRINCIPAL -->
-  <main style="flex: 1; padding: 30px; background-color: #f5f6fa; overflow-y: auto;">
-    <router-outlet></router-outlet>
-  </main>
-</div>
+  </div>
+}
+
+<header class="sticky top-0 z-40 bg-cream-card border-b border-cocoa/15">
+  <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4">
+    <a routerLink="/layout/cliente" tabindex="0" class="font-display text-xl font-semibold text-crust shrink-0">
+      Pedidos 360
+    </a>
+
+    <nav aria-label="Navegación principal" class="hidden sm:block">
+      <a
+        [routerLink]="'/layout/' + (rol() ?? 'cliente')"
+        tabindex="0"
+        class="text-sm font-medium text-cocoa hover:text-crust border-b-2 border-transparent hover:border-wheat focus:border-wheat pb-1 transition-colors">
+        {{ etiquetaRol() }}
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-3">
+      @if (rol() === 'cliente') {
+        <button aria-label="Ver alertas" tabindex="0" class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
+          <span aria-hidden="true">🔔</span>
+          @if (hasUnreadAlerts()) {
+            <span class="absolute -top-0.5 -right-0.5 bg-jam text-white text-[10px] leading-none rounded-full px-1.5 py-1" aria-hidden="true">!</span>
+          }
+        </button>
+
+        <a routerLink="/layout/cliente" aria-label="Ver carrito" tabindex="0" class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
+          <span aria-hidden="true">🛒</span>
+          @if (cartCount() > 0) {
+            <span class="absolute -top-0.5 -right-0.5 bg-jam text-white text-[10px] leading-none rounded-full px-1.5 py-1" aria-hidden="true">{{ cartCount() }}</span>
+          }
+        </a>
+      }
+
+      <div class="hidden md:block text-right leading-tight" tabindex="0" aria-label="Sesión iniciada como">
+        <strong class="block text-sm text-crust">{{ nombre() }}</strong>
+        <small class="text-xs text-cocoa">{{ etiquetaRol() }}</small>
+      </div>
+
+      <button
+        (click)="cerrarSesion()"
+        tabindex="0"
+        class="text-sm font-medium border border-jam text-jam px-3 py-1.5 rounded-full hover:bg-jam hover:text-white focus:outline focus:outline-2 focus:outline-jam transition-colors">
+        Cerrar sesión
+      </button>
+    </div>
+  </div>
+</header>
+
+<main tabindex="-1" class="min-h-[70vh] bg-dough">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="bg-crust text-dough/80 text-center py-6 text-sm">
+  <p tabindex="0">Pedidos 360 · Asociación de panaderías, pastelerías y cafeterías</p>
+</footer>

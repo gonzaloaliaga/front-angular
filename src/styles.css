@@ -1,3 +1,48 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+/*
+  Paleta "Pedidos 360": inspirada en el proceso de horneado, no en el
+  cliché genérico crema+terracota. crust = costra horneada, dough = masa
+  leudada, wheat = trigo tostado (acento principal), jam = mermelada
+  (acento secundario, solo para precios/alertas), cocoa = texto secundario.
+*/
+@theme {
+  --color-crust: #2b1b14;
+  --color-dough: #fbf2e4;
+  --color-wheat: #d9a441;
+  --color-wheat-dark: #b9822b;
+  --color-jam: #8c2f39;
+  --color-cocoa: #6b4a3a;
+  --color-cream-card: #fffdf8;
+
+  --font-display: 'Fraunces', serif;
+  --font-sans: 'Work Sans', sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-dough);
+  color: var(--color-crust);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
+/* Scrollbar discreto para tiras horizontales (locales, categorías) */
+.scroll-fino::-webkit-scrollbar {
+  height: 6px;
+}
+.scroll-fino::-webkit-scrollbar-thumb {
+  background-color: var(--color-wheat);
+  border-radius: 999px;
+}

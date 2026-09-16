@@ -42,7 +42,6 @@ jobs:
         script: |
           sudo rm -rf /var/www/html/*
           sudo cp -a ~/dist/front-angular/browser/. /var/www/html/
-          sudo mv /var/www/html/index.csr.html /var/www/html/index.html
           sudo chown -R www-data:www-data /var/www/html
           sudo chmod -R 755 /var/www/html
           sudo systemctl restart nginx
