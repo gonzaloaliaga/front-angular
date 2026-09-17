@@ -24,6 +24,14 @@ jobs:
     - name: Compilar Angular (Producción)
       run: npm run build
 
+    - name: Limpiar carpeta temporal en el servidor
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: rm -rf ~/dist
+
     - name: Enviar archivos al servidor (SCP)
       uses: appleboy/scp-action@master
       with:
