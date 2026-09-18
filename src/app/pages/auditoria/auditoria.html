@@ -1,65 +1,200 @@
 <div class="max-w-5xl mx-auto px-5 py-8">
   <div class="flex items-center justify-between mb-6">
     <h1 tabindex="0" class="font-display text-2xl text-crust">Supervisión y auditoría</h1>
-    <button (click)="cargar()" tabindex="0" class="text-sm font-medium border border-cocoa/20 text-cocoa px-3 py-1.5 rounded-full hover:border-wheat hover:text-crust focus:outline focus:outline-2 focus:outline-wheat">
+    <button (click)="vista() === 'resumen' ? cargar() : cargarInventario()" tabindex="0" class="text-sm font-medium border border-cocoa/20 text-cocoa px-3 py-1.5 rounded-full hover:border-wheat hover:text-crust focus:outline focus:outline-2 focus:outline-wheat">
       Actualizar
     </button>
   </div>
 
-  @if (errorCarga()) {
-    <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorCarga() }}</div>
+  <!-- Tabs -->
+  <div class="flex gap-6 border-b border-cocoa/15 mb-8" role="tablist">
+    <button
+      (click)="vista.set('resumen')"
+      tabindex="0"
+      [attr.aria-selected]="vista() === 'resumen'"
+      role="tab"
+      class="pb-3 text-sm font-semibold border-b-2 transition-colors"
+      [class]="vista() === 'resumen' ? 'border-wheat text-crust' : 'border-transparent text-cocoa hover:text-crust'">
+      Resumen
+    </button>
+    <button
+      (click)="vista.set('inventario')"
+      tabindex="0"
+      [attr.aria-selected]="vista() === 'inventario'"
+      role="tab"
+      class="pb-3 text-sm font-semibold border-b-2 transition-colors"
+      [class]="vista() === 'inventario' ? 'border-wheat text-crust' : 'border-transparent text-cocoa hover:text-crust'">
+      Gestión de inventario
+    </button>
+  </div>
+
+  @if (vista() === 'resumen') {
+    @if (errorCarga()) {
+      <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorCarga() }}</div>
+    }
+
+    <!-- KPIs -->
+    <div class="grid sm:grid-cols-3 gap-4 mb-10">
+      <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+        <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Ventas totales</p>
+        <p class="font-display text-2xl text-crust">${{ resumen()?.ventasTotales ?? 0 | number }}</p>
+      </div>
+      <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+        <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Pedidos registrados</p>
+        <p class="font-display text-2xl text-crust">{{ resumen()?.totalPedidos ?? 0 }}</p>
+      </div>
+      <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
+        <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Entregados</p>
+        <p class="font-display text-2xl text-crust">{{ resumen()?.totalEntregados ?? 0 }}</p>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-10">
+      <section aria-labelledby="ventas-local">
+        <h2 id="ventas-local" tabindex="0" class="font-display text-lg text-crust mb-4">Ventas por local</h2>
+        <div class="space-y-3">
+          @for (fila of resumen()?.porLocal ?? []; track fila.localId) {
+            <div tabindex="0">
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-crust font-medium">{{ nombreLocalPorId().get(fila.localId) ?? ('Local ' + fila.localId) }}</span>
+                <span class="text-cocoa">${{ fila.total | number }}</span>
+              </div>
+              <div class="h-2 bg-cocoa/10 rounded-full overflow-hidden">
+                <div class="h-full bg-wheat" [style.width.%]="(fila.total / maxVentaLocal()) * 100"></div>
+              </div>
+            </div>
+          } @empty {
+            <p tabindex="0" class="text-sm text-cocoa">Todavía no hay ventas registradas.</p>
+          }
+        </div>
+      </section>
+
+      <section aria-labelledby="notificaciones">
+        <h2 id="notificaciones" tabindex="0" class="font-display text-lg text-crust mb-4">Registro de eventos</h2>
+        <ul class="space-y-3">
+          @for (evento of eventos(); track evento.id) {
+            <li tabindex="0" class="text-sm border-l-2 border-wheat pl-3">
+              <p class="text-crust">{{ evento.descripcion }}</p>
+              <p class="text-xs text-cocoa">{{ evento.fecha | date:'short' }} · rol: {{ evento.rol }}</p>
+            </li>
+          } @empty {
+            <p tabindex="0" class="text-sm text-cocoa">Sin eventos registrados todavía.</p>
+          }
+        </ul>
+      </section>
+    </div>
   }
 
-  <!-- KPIs -->
-  <div class="grid sm:grid-cols-3 gap-4 mb-10">
-    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
-      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Ventas totales</p>
-      <p class="font-display text-2xl text-crust">${{ resumen()?.ventasTotales ?? 0 | number }}</p>
-    </div>
-    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
-      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Pedidos registrados</p>
-      <p class="font-display text-2xl text-crust">{{ resumen()?.totalPedidos ?? 0 }}</p>
-    </div>
-    <div tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-5">
-      <p class="text-xs text-cocoa uppercase tracking-wide mb-1">Entregados</p>
-      <p class="font-display text-2xl text-crust">{{ resumen()?.totalEntregados ?? 0 }}</p>
-    </div>
-  </div>
+  @if (vista() === 'inventario') {
+    @if (errorInventario()) {
+      <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorInventario() }}</div>
+    }
 
-  <div class="grid md:grid-cols-2 gap-10">
-    <!-- Ventas por local -->
-    <section aria-labelledby="ventas-local">
-      <h2 id="ventas-local" tabindex="0" class="font-display text-lg text-crust mb-4">Ventas por local</h2>
-      <div class="space-y-3">
-        @for (fila of resumen()?.porLocal ?? []; track fila.localId) {
-          <div tabindex="0">
-            <div class="flex justify-between text-sm mb-1">
-              <span class="text-crust font-medium">{{ nombreLocalPorId().get(fila.localId) ?? ('Local ' + fila.localId) }}</span>
-              <span class="text-cocoa">${{ fila.total | number }}</span>
-            </div>
-            <div class="h-2 bg-cocoa/10 rounded-full overflow-hidden">
-              <div class="h-full bg-wheat" [style.width.%]="(fila.total / maxVentaLocal()) * 100"></div>
+    <div class="flex justify-end mb-4">
+      <button
+        (click)="abrirNuevoProducto()"
+        tabindex="0"
+        class="bg-wheat text-crust font-semibold text-sm px-4 py-2 rounded-full hover:bg-wheat-dark focus:outline focus:outline-2 focus:outline-crust transition-colors">
+        + Nuevo producto
+      </button>
+    </div>
+
+    @if (mostrarFormulario()) {
+      <div class="bg-cream-card border border-cocoa/10 rounded-2xl p-5 mb-6">
+        <h2 tabindex="0" class="font-display text-lg text-crust mb-4">{{ tituloFormulario() }}</h2>
+
+        <div class="grid sm:grid-cols-2 gap-4 mb-4">
+          <label class="block">
+            <span class="text-xs font-semibold text-cocoa">Nombre</span>
+            <input type="text" [value]="formulario().nombre" (input)="actualizarCampo('nombre', $any($event.target).value)"
+                   tabindex="0" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-cocoa">Precio</span>
+            <input type="number" min="0" [value]="formulario().precio" (input)="actualizarCampo('precio', +$any($event.target).value)"
+                   tabindex="0" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+          </label>
+
+          <label class="block sm:col-span-2">
+            <span class="text-xs font-semibold text-cocoa">Descripción</span>
+            <textarea [value]="formulario().descripcion" (input)="actualizarCampo('descripcion', $any($event.target).value)"
+                      tabindex="0" rows="2" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat"></textarea>
+          </label>
+
+          <label class="block sm:col-span-2">
+            <span class="text-xs font-semibold text-cocoa">URL de la imagen</span>
+            <input type="text" [value]="formulario().imagenUrl" (input)="actualizarCampo('imagenUrl', $any($event.target).value)"
+                   tabindex="0" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-cocoa">Stock</span>
+            <input type="number" min="0" [value]="formulario().stock" (input)="actualizarCampo('stock', +$any($event.target).value)"
+                   tabindex="0" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-cocoa">Categoría</span>
+            <select [value]="formulario().categoriaId" (change)="actualizarCampo('categoriaId', +$any($event.target).value)"
+                    tabindex="0" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+              <option [value]="null" disabled>Selecciona una categoría</option>
+              @for (cat of categorias(); track cat.id) {
+                <option [value]="cat.id">{{ cat.nombre }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-cocoa">Local</span>
+            <select [value]="formulario().localId" (change)="actualizarCampo('localId', +$any($event.target).value)"
+                    tabindex="0" class="w-full mt-1 text-sm border border-cocoa/20 rounded-lg px-3 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+              <option [value]="null" disabled>Selecciona un local</option>
+              @for (local of locales(); track local.id) {
+                <option [value]="local.id">{{ local.nombre }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        <div class="flex gap-3">
+          <button (click)="guardarProducto()" [disabled]="guardando()" tabindex="0"
+                  class="bg-crust text-dough font-semibold text-sm px-4 py-2 rounded-full hover:bg-cocoa disabled:opacity-50 focus:outline focus:outline-2 focus:outline-wheat transition-colors">
+            {{ guardando() ? 'Guardando…' : 'Guardar' }}
+          </button>
+          <button (click)="cancelarFormulario()" tabindex="0"
+                  class="text-sm font-medium border border-cocoa/20 text-cocoa px-4 py-2 rounded-full hover:border-jam hover:text-jam focus:outline focus:outline-2 focus:outline-jam">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="space-y-3">
+      @for (producto of productos(); track producto.id) {
+        <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center gap-3">
+            <img [src]="producto.imagenUrl" [alt]="producto.nombre" class="w-14 h-14 rounded-xl object-cover">
+            <div>
+              <p class="font-medium text-crust">{{ producto.nombre }}</p>
+              <p class="text-xs text-cocoa">{{ producto.categoria }} · {{ producto.local }} · Stock: {{ producto.stock }}</p>
             </div>
           </div>
-        } @empty {
-          <p tabindex="0" class="text-sm text-cocoa">Todavía no hay ventas registradas.</p>
-        }
-      </div>
-    </section>
-
-    <!-- Notificaciones / trazabilidad -->
-    <section aria-labelledby="notificaciones">
-      <h2 id="notificaciones" tabindex="0" class="font-display text-lg text-crust mb-4">Registro de eventos</h2>
-      <ul class="space-y-3">
-        @for (evento of eventos(); track evento.id) {
-          <li tabindex="0" class="text-sm border-l-2 border-wheat pl-3">
-            <p class="text-crust">{{ evento.descripcion }}</p>
-            <p class="text-xs text-cocoa">{{ evento.fecha | date:'short' }} · rol: {{ evento.rol }}</p>
-          </li>
-        } @empty {
-          <p tabindex="0" class="text-sm text-cocoa">Sin eventos registrados todavía.</p>
-        }
-      </ul>
-    </section>
-  </div>
+          <div class="flex items-center gap-3">
+            <span class="text-crust font-semibold">${{ producto.precio | number }}</span>
+            <button (click)="editarProducto(producto)" tabindex="0" [attr.aria-label]="'Editar ' + producto.nombre"
+                    class="text-sm font-medium border border-cocoa/20 text-cocoa px-3 py-1.5 rounded-full hover:border-wheat hover:text-crust focus:outline focus:outline-2 focus:outline-wheat">
+              Editar
+            </button>
+            <button (click)="eliminarProducto(producto)" tabindex="0" [attr.aria-label]="'Dar de baja ' + producto.nombre"
+                    class="text-sm font-medium border border-jam text-jam px-3 py-1.5 rounded-full hover:bg-jam hover:text-white focus:outline focus:outline-2 focus:outline-jam">
+              Dar de baja
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <p tabindex="0" class="text-sm text-cocoa">No hay productos activos todavía.</p>
+      }
+    </div>
+  }
 </div>

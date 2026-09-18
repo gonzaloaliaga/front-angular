@@ -21,6 +21,21 @@ export interface LocalApi {
   activo: boolean;
 }
 
+export interface CategoriaApi {
+  id: number;
+  nombre: string;
+}
+
+export interface ProductoPayload {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  imagenUrl: string;
+  categoriaId: number;
+  localId: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class InventarioApi {
   private http = inject(HttpClient);
@@ -35,5 +50,21 @@ export class InventarioApi {
 
   listarLocales(): Observable<LocalApi[]> {
     return this.http.get<LocalApi[]>(`${this.baseUrl}/locales`);
+  }
+
+  listarCategorias(): Observable<CategoriaApi[]> {
+    return this.http.get<CategoriaApi[]>(`${this.baseUrl}/categorias`);
+  }
+
+  crearProducto(payload: ProductoPayload): Observable<ProductoApi> {
+    return this.http.post<ProductoApi>(`${this.baseUrl}/productos`, payload);
+  }
+
+  actualizarProducto(id: number, payload: ProductoPayload): Observable<ProductoApi> {
+    return this.http.put<ProductoApi>(`${this.baseUrl}/productos/${id}`, payload);
+  }
+
+  eliminarProducto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/productos/${id}`);
   }
 }
