@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { PedidosApi, EventoAuditoriaApi, ResumenVentasApi } from '../../core/api/pedidos.api';
+import { PedidosApi, EventoAuditoriaApi, ResumenVentasApi, PedidoApi } from '../../core/api/pedidos.api';
 import { InventarioApi, ProductoApi, LocalApi, CategoriaApi, ProductoPayload } from '../../core/api/inventario.api';
 
 interface FormularioProducto {
@@ -30,7 +30,7 @@ export class AuditoriaComponent {
   private pedidosApi = inject(PedidosApi);
   private inventarioApi = inject(InventarioApi);
 
-  vista = signal<'resumen' | 'inventario'>('resumen');
+  vista = signal<'resumen' | 'inventario' | 'ventas'>('resumen');
 
   // --- Resumen / eventos ---
   resumen = signal<ResumenVentasApi | null>(null);
@@ -49,9 +49,14 @@ export class AuditoriaComponent {
 
   tituloFormulario = computed(() => this.formulario().id ? 'Editar producto' : 'Nuevo producto');
 
+  // --- Ventas ---
+  ventas = signal<PedidoApi[]>([]);
+  errorVentas = signal<string | null>(null);
+
   constructor() {
     this.cargar();
     this.cargarInventario();
+    this.cargarVentas();
   }
 
   cargar() {
@@ -153,6 +158,31 @@ export class AuditoriaComponent {
     this.inventarioApi.eliminarProducto(producto.id).subscribe({
       next: () => this.cargarInventario(),
       error: () => this.errorInventario.set('No se pudo dar de baja el producto.')
+    });
+  }
+
+  // --- Ventas ---
+  cargarVentas() {
+    this.errorVentas.set(null);
+    this.pedidosApi.listar().subscribe({
+      next: (p) => this.ventas.set(p),
+      error: () => this.errorVentas.set('No se pudo conectar con el microservicio de Pedidos (puerto 8082).')
+    });
+  }
+
+  puedeCancelar(pedido: PedidoApi): boolean {
+    return pedido.estado !== 'Entregado' && pedido.estado !== 'Cancelado';
+  }
+
+  cancelarVenta(pedido: PedidoApi) {
+    if (!confirm(`¿Cancelar el pedido #${pedido.id}? Esta acción no se puede deshacer.`)) return;
+    this.pedidosApi.cancelar(pedido.id).subscribe({
+      next: () => this.cargarVentas(),
+      error: (err) => this.errorVentas.set(
+        err.status === 409
+          ? 'No se puede cancelar un pedido que ya fue entregado.'
+          : 'No se pudo cancelar el pedido.'
+      )
     });
   }
 }

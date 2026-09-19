@@ -26,6 +26,15 @@
       [class]="vista() === 'inventario' ? 'border-wheat text-crust' : 'border-transparent text-cocoa hover:text-crust'">
       Gestión de inventario
     </button>
+    <button
+      (click)="vista.set('ventas')"
+      tabindex="0"
+      [attr.aria-selected]="vista() === 'ventas'"
+      role="tab"
+      class="pb-3 text-sm font-semibold border-b-2 transition-colors"
+      [class]="vista() === 'ventas' ? 'border-wheat text-crust' : 'border-transparent text-cocoa hover:text-crust'">
+      Ventas
+    </button>
   </div>
 
   @if (vista() === 'resumen') {
@@ -194,6 +203,42 @@
         </article>
       } @empty {
         <p tabindex="0" class="text-sm text-cocoa">No hay productos activos todavía.</p>
+      }
+    </div>
+  }
+
+  @if (vista() === 'ventas') {
+    @if (errorVentas()) {
+      <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorVentas() }}</div>
+    }
+
+    <div class="space-y-3">
+      @for (pedido of ventas(); track pedido.id) {
+        <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ pedido.clienteNombre }}</p>
+            <p class="text-xs text-cocoa">
+              {{ nombreLocalPorId().get(pedido.localId) ?? ('Local ' + pedido.localId) }} ·
+              {{ pedido.modalidad }} · {{ pedido.creadoEn | date:'short' }}
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-crust font-semibold">${{ pedido.total | number }}</span>
+            <span
+              class="text-xs font-semibold px-3 py-1 rounded-full"
+              [class]="pedido.estado === 'Entregado' ? 'bg-green-100 text-green-700' : pedido.estado === 'Cancelado' ? 'bg-jam/10 text-jam' : 'bg-cocoa/10 text-cocoa'">
+              {{ pedido.estado }}
+            </span>
+            @if (puedeCancelar(pedido)) {
+              <button (click)="cancelarVenta(pedido)" tabindex="0" [attr.aria-label]="'Cancelar pedido ' + pedido.id"
+                      class="text-sm font-medium border border-jam text-jam px-3 py-1.5 rounded-full hover:bg-jam hover:text-white focus:outline focus:outline-2 focus:outline-jam">
+                Cancelar
+              </button>
+            }
+          </div>
+        </article>
+      } @empty {
+        <p tabindex="0" class="text-sm text-cocoa">Todavía no hay ventas registradas.</p>
       }
     </div>
   }
