@@ -75,6 +75,10 @@ export class PedidosApi {
     return this.http.patch<PedidoApi>(`${this.baseUrl}/pedidos/${id}/entregar`, {});
   }
 
+  cancelar(id: number): Observable<PedidoApi> {
+    return this.http.patch<PedidoApi>(`${this.baseUrl}/pedidos/${id}/cancelar`, {});
+  }
+
   eventos(): Observable<EventoAuditoriaApi[]> {
     return this.http.get<EventoAuditoriaApi[]>(`${this.baseUrl}/eventos-auditoria`);
   }
