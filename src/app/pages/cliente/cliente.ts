@@ -6,6 +6,8 @@ import { InventarioApi, LocalApi } from '../../core/api/inventario.api';
 import { PedidosApi, PedidoApi } from '../../core/api/pedidos.api';
 import { Modalidad } from '../../core/models/pedido.model';
 
+const CLAVE_FAVORITOS = 'pedidos360_locales_favoritos';
+
 @Component({
   selector: 'app-cliente',
   standalone: true,
@@ -24,9 +26,11 @@ export class ClienteComponent {
 
   vista = signal<'catalogo' | 'cuenta'>('catalogo');
   categoriaSeleccionada = signal<string>('Todas');
+  busqueda = signal<string>('');
+  soloFavoritos = signal<boolean>(false);
   modalidad = signal<Modalidad>('Retiro en tienda');
   direccion = signal<string>('');
-  pedidoConfirmado = signal<number | null>(null);
+  pedidoConfirmado = signal<PedidoApi | null>(null);
   cargando = signal<boolean>(true);
   errorCarga = signal<string | null>(null);
   errorConfirmacion = signal<string | null>(null);
@@ -36,6 +40,7 @@ export class ClienteComponent {
   productos = signal<Producto[]>([]);
   misPedidos = signal<PedidoApi[]>([]);
   nombreLocalPorId = signal<Map<number, string>>(new Map());
+  localesFavoritos = signal<Set<number>>(this.leerFavoritosGuardados());
 
   constructor() {
     this.cargarCatalogo();
@@ -44,8 +49,39 @@ export class ClienteComponent {
 
   productosFiltrados = computed(() => {
     const cat = this.categoriaSeleccionada();
-    return cat === 'Todas' ? this.productos() : this.productos().filter(p => p.categoria === cat);
+    const texto = this.busqueda().trim().toLowerCase();
+    const favoritos = this.localesFavoritos();
+    const soloFav = this.soloFavoritos();
+
+    return this.productos().filter(p => {
+      if (cat !== 'Todas' && p.categoria !== cat) return false;
+      if (soloFav && !favoritos.has(p.localId)) return false;
+      if (texto && !p.nombre.toLowerCase().includes(texto) && !p.descripcion.toLowerCase().includes(texto)) return false;
+      return true;
+    });
   });
+
+  private leerFavoritosGuardados(): Set<number> {
+    try {
+      const guardado = localStorage.getItem(CLAVE_FAVORITOS);
+      return guardado ? new Set(JSON.parse(guardado)) : new Set();
+    } catch {
+      return new Set();
+    }
+  }
+
+  private guardarFavoritos() {
+    localStorage.setItem(CLAVE_FAVORITOS, JSON.stringify([...this.localesFavoritos()]));
+  }
+
+  alternarFavorito(localId: number) {
+    this.localesFavoritos.update(favoritos => {
+      const nuevo = new Set(favoritos);
+      nuevo.has(localId) ? nuevo.delete(localId) : nuevo.add(localId);
+      return nuevo;
+    });
+    this.guardarFavoritos();
+  }
 
   private cargarCatalogo() {
     this.cargando.set(true);
@@ -113,7 +149,7 @@ export class ClienteComponent {
     }).subscribe({
       next: (pedido) => {
         this.carritoService.vaciar();
-        this.pedidoConfirmado.set(pedido.id);
+        this.pedidoConfirmado.set(pedido);
         this.vista.set('cuenta');
         this.cargarMisPedidos();
         this.cargarCatalogo(); // refresca stock mostrado tras la reserva
