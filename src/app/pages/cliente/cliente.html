@@ -37,6 +37,27 @@
 
       <!-- Catálogo -->
       <div>
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+          <label class="flex-1 relative">
+            <span class="sr-only">Buscar productos</span>
+            <input
+              type="search"
+              placeholder="Buscar productos…"
+              [value]="busqueda()"
+              (input)="busqueda.set($any($event.target).value)"
+              tabindex="0"
+              class="w-full text-sm border border-cocoa/20 rounded-full pl-4 pr-4 py-2 focus:outline focus:outline-2 focus:outline-wheat">
+          </label>
+          <button
+            (click)="soloFavoritos.set(!soloFavoritos())"
+            tabindex="0"
+            [attr.aria-pressed]="soloFavoritos()"
+            class="shrink-0 text-sm font-medium px-4 py-2 rounded-full border transition-colors"
+            [class]="soloFavoritos() ? 'bg-jam text-white border-jam' : 'bg-cream-card text-cocoa border-cocoa/20 hover:border-jam'">
+            ♥ Solo favoritos
+          </button>
+        </div>
+
         <div class="flex gap-2 overflow-x-auto scroll-fino pb-2 mb-6">
           @for (cat of categorias; track cat) {
             <button
@@ -55,6 +76,14 @@
             <article tabindex="0" class="bg-cream-card rounded-2xl overflow-hidden border border-cocoa/10 flex flex-col">
               <div class="relative h-40">
                 <img [src]="producto.imagenUrl" [alt]="'Fotografía de ' + producto.nombre" class="w-full h-full object-cover">
+                <button
+                  (click)="alternarFavorito(producto.localId)"
+                  tabindex="0"
+                  [attr.aria-label]="(localesFavoritos().has(producto.localId) ? 'Quitar' : 'Marcar') + ' ' + producto.local + ' como favorito'"
+                  class="absolute top-2 left-2 w-7 h-7 rounded-full bg-white/90 flex items-center justify-center text-sm"
+                  [class]="localesFavoritos().has(producto.localId) ? 'text-jam' : 'text-cocoa/50'">
+                  ♥
+                </button>
                 <span class="absolute top-2 right-2 bg-crust text-dough text-[11px] font-semibold px-2.5 py-1 rounded-full">
                   {{ producto.local }}
                 </span>
@@ -161,9 +190,12 @@
       </div>
 
       <div>
-        @if (pedidoConfirmado()) {
+        @if (pedidoConfirmado(); as pedido) {
           <div class="bg-wheat/20 border border-wheat rounded-2xl p-4 mb-6" tabindex="0" role="status">
-            ¡Listo! Tu pedido #{{ pedidoConfirmado() }} fue enviado a cocina.
+            <p class="font-semibold text-crust">¡Pedido #{{ pedido.id }} enviado a {{ nombreLocalPorId().get(pedido.localId) ?? 'tu local' }}!</p>
+            <p class="text-sm text-cocoa mt-1">
+              {{ pedido.items.length }} producto(s) · ${{ pedido.total | number }} · {{ pedido.modalidad }}
+            </p>
           </div>
         }
 

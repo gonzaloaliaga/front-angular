@@ -99,6 +99,17 @@
       <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorInventario() }}</div>
     }
 
+    @if (productosStockBajo().length > 0) {
+      <div class="bg-wheat/15 border border-wheat rounded-2xl p-4 mb-6" tabindex="0">
+        <p class="font-semibold text-crust text-sm mb-2">⚠ {{ productosStockBajo().length }} producto(s) con poco stock</p>
+        <ul class="text-sm text-cocoa space-y-1">
+          @for (p of productosStockBajo(); track p.id) {
+            <li>{{ p.nombre }} · {{ p.local }} — quedan <strong class="text-jam">{{ p.stock }}</strong></li>
+          }
+        </ul>
+      </div>
+    }
+
     <div class="flex justify-end mb-4">
       <button
         (click)="abrirNuevoProducto()"
@@ -212,8 +223,29 @@
       <div class="bg-jam/10 border border-jam text-jam rounded-2xl p-4 mb-6" tabindex="0" role="alert">{{ errorVentas() }}</div>
     }
 
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex gap-2" role="tablist" aria-label="Filtrar por fecha">
+        @for (opcion of [['hoy','Hoy'],['semana','Últimos 7 días'],['mes','Último mes'],['todos','Todos']]; track opcion[0]) {
+          <button
+            (click)="filtroFecha.set($any(opcion[0]))"
+            tabindex="0"
+            [attr.aria-pressed]="filtroFecha() === opcion[0]"
+            class="text-sm font-medium px-3 py-1.5 rounded-full border transition-colors"
+            [class]="filtroFecha() === opcion[0] ? 'bg-crust text-dough border-crust' : 'bg-cream-card text-cocoa border-cocoa/20 hover:border-wheat'">
+            {{ opcion[1] }}
+          </button>
+        }
+      </div>
+      <button
+        (click)="exportarVentasCsv()"
+        tabindex="0"
+        class="text-sm font-medium border border-cocoa/20 text-cocoa px-3 py-1.5 rounded-full hover:border-wheat hover:text-crust focus:outline focus:outline-2 focus:outline-wheat">
+        ⬇ Exportar CSV
+      </button>
+    </div>
+
     <div class="space-y-3">
-      @for (pedido of ventas(); track pedido.id) {
+      @for (pedido of ventasFiltradas(); track pedido.id) {
         <article tabindex="0" class="bg-cream-card border border-cocoa/10 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
           <div>
             <p class="font-medium text-crust">Pedido #{{ pedido.id }} · {{ pedido.clienteNombre }}</p>
@@ -238,7 +270,7 @@
           </div>
         </article>
       } @empty {
-        <p tabindex="0" class="text-sm text-cocoa">Todavía no hay ventas registradas.</p>
+        <p tabindex="0" class="text-sm text-cocoa">No hay ventas en este período.</p>
       }
     </div>
   }

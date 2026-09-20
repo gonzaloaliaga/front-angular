@@ -19,6 +19,9 @@ const FORMULARIO_VACIO: FormularioProducto = {
   imagenUrl: '', categoriaId: null, localId: null
 };
 
+type FiltroFecha = 'hoy' | 'semana' | 'mes' | 'todos';
+const UMBRAL_STOCK_BAJO = 10;
+
 @Component({
   selector: 'app-auditoria',
   standalone: true,
@@ -49,9 +52,34 @@ export class AuditoriaComponent {
 
   tituloFormulario = computed(() => this.formulario().id ? 'Editar producto' : 'Nuevo producto');
 
+  // Productos con poco stock, los más urgentes primero. Se muestran arriba de todo.
+  productosStockBajo = computed(() =>
+    this.productos()
+      .filter(p => p.stock < UMBRAL_STOCK_BAJO)
+      .sort((a, b) => a.stock - b.stock)
+  );
+
   // --- Ventas ---
   ventas = signal<PedidoApi[]>([]);
   errorVentas = signal<string | null>(null);
+  filtroFecha = signal<FiltroFecha>('todos');
+
+  ventasFiltradas = computed(() => {
+    const filtro = this.filtroFecha();
+    if (filtro === 'todos') return this.ventas();
+
+    const ahora = new Date();
+    const inicio = new Date(ahora);
+    if (filtro === 'hoy') {
+      inicio.setHours(0, 0, 0, 0);
+    } else if (filtro === 'semana') {
+      inicio.setDate(inicio.getDate() - 7);
+    } else if (filtro === 'mes') {
+      inicio.setMonth(inicio.getMonth() - 1);
+    }
+
+    return this.ventas().filter(p => new Date(p.creadoEn) >= inicio);
+  });
 
   constructor() {
     this.cargar();
@@ -118,19 +146,26 @@ export class AuditoriaComponent {
 
   guardarProducto() {
     const f = this.formulario();
-    if (!f.nombre || f.precio === null || f.stock === null || !f.categoriaId || !f.localId) {
-      this.errorInventario.set('Completa nombre, precio, stock, categoría y local antes de guardar.');
+    const faltantes: string[] = [];
+    if (!f.nombre) faltantes.push('nombre');
+    if (f.precio === null) faltantes.push('precio');
+    if (f.stock === null) faltantes.push('stock');
+    if (!f.categoriaId) faltantes.push('categoría');
+    if (!f.localId) faltantes.push('local');
+
+    if (faltantes.length > 0) {
+      this.errorInventario.set(`Falta completar: ${faltantes.join(', ')}.`);
       return;
     }
 
     const payload: ProductoPayload = {
       nombre: f.nombre,
       descripcion: f.descripcion,
-      precio: f.precio,
-      stock: f.stock,
+      precio: f.precio!,
+      stock: f.stock!,
       imagenUrl: f.imagenUrl,
-      categoriaId: f.categoriaId,
-      localId: f.localId
+      categoriaId: f.categoriaId!,
+      localId: f.localId!
     };
 
     this.guardando.set(true);
@@ -184,5 +219,28 @@ export class AuditoriaComponent {
           : 'No se pudo cancelar el pedido.'
       )
     });
+  }
+
+  exportarVentasCsv() {
+    const filas = this.ventasFiltradas();
+    const encabezado = ['ID', 'Cliente', 'Local', 'Modalidad', 'Estado', 'Total', 'Fecha'];
+    const lineas = filas.map(p => [
+      p.id,
+      `"${p.clienteNombre}"`,
+      `"${this.nombreLocalPorId().get(p.localId) ?? p.localId}"`,
+      p.modalidad,
+      p.estado,
+      p.total,
+      new Date(p.creadoEn).toLocaleString('es-CL')
+    ].join(','));
+
+    const csv = [encabezado.join(','), ...lineas].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = `ventas-pedidos360-${this.filtroFecha()}.csv`;
+    enlace.click();
+    URL.revokeObjectURL(url);
   }
 }
