@@ -28,14 +28,66 @@
     </nav>
 
     <div class="flex items-center gap-3">
-      @if (rol() === 'cliente') {
-        <button aria-label="Ver alertas" tabindex="0" class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
-          <span aria-hidden="true">🔔</span>
-          @if (hasUnreadAlerts()) {
-            <span class="absolute -top-0.5 -right-0.5 bg-jam text-white text-[10px] leading-none rounded-full px-1.5 py-1" aria-hidden="true">!</span>
-          }
-        </button>
+      @if (mostrarCampana()) {
+        <div class="relative">
+          <button
+            type="button"
+            (click)="alternarPanel()"
+            [attr.aria-expanded]="panelAbierto()"
+            aria-haspopup="true"
+            aria-label="Ver notificaciones"
+            tabindex="0"
+            class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
+            <span aria-hidden="true">🔔</span>
+            @if (noLeidas() > 0) {
+              <span class="absolute -top-0.5 -right-0.5 bg-jam text-white text-[10px] leading-none rounded-full px-1.5 py-1" aria-hidden="true">{{ noLeidas() > 9 ? '9+' : noLeidas() }}</span>
+            }
+          </button>
 
+          @if (panelAbierto()) {
+            <button type="button" class="fixed inset-0 z-10 cursor-default" aria-label="Cerrar notificaciones" tabindex="-1" (click)="cerrarPanel()"></button>
+
+            <section class="absolute right-0 mt-2 w-80 max-w-[90vw] bg-cream-card border border-cocoa/15 rounded-xl shadow-lg z-20" aria-label="Notificaciones">
+              <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-cocoa/10">
+                <strong class="text-sm text-crust">Notificaciones</strong>
+                @if (noLeidas() > 0) {
+                  <button
+                    type="button"
+                    (click)="marcarTodasLeidas()"
+                    class="text-xs font-medium text-jam hover:underline focus:outline focus:outline-2 focus:outline-jam rounded">
+                    Marcar todas como leídas
+                  </button>
+                }
+              </div>
+
+              <ul class="max-h-80 overflow-y-auto divide-y divide-cocoa/10">
+                @for (n of notificaciones(); track n.id) {
+                  <li>
+                    <button
+                      type="button"
+                      (click)="alElegirNotificacion(n)"
+                      class="w-full flex items-start gap-3 text-left px-4 py-3 hover:bg-dough focus:outline focus:outline-2 focus:outline-wheat">
+                      @if (!n.leida) {
+                        <span class="mt-1.5 h-2 w-2 rounded-full bg-jam shrink-0" aria-label="Sin leer"></span>
+                      } @else {
+                        <span class="mt-1.5 h-2 w-2 shrink-0" aria-hidden="true"></span>
+                      }
+                      <span class="block min-w-0">
+                        <span class="block text-sm text-crust" [class]="n.leida ? 'font-normal' : 'font-semibold'">{{ n.mensaje }}</span>
+                        <time class="block text-xs text-cocoa/70 mt-0.5">{{ n.creadoEn | date:'dd/MM HH:mm' }}</time>
+                      </span>
+                    </button>
+                  </li>
+                } @empty {
+                  <li class="px-4 py-6 text-sm text-cocoa text-center">No tienes notificaciones.</li>
+                }
+              </ul>
+            </section>
+          }
+        </div>
+      }
+
+      @if (rol() === 'cliente') {
         <a routerLink="/layout/cliente" aria-label="Ver carrito" tabindex="0" class="relative p-2 text-cocoa hover:text-crust focus:outline focus:outline-2 focus:outline-wheat rounded-full">
           <span aria-hidden="true">🛒</span>
           @if (cartCount() > 0) {
