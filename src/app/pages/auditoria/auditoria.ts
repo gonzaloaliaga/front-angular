@@ -22,6 +22,11 @@ const FORMULARIO_VACIO: FormularioProducto = {
 type FiltroFecha = 'hoy' | 'semana' | 'mes' | 'todos';
 const UMBRAL_STOCK_BAJO = 10;
 
+// Al cancelar un pedido, el stock se devuelve por mensajería (RabbitMQ), de forma asíncrona:
+// llega unos instantes después de la respuesta. Por eso se vuelve a consultar el inventario
+// pasado este tiempo (en milisegundos), una vez por cada valor.
+const ESPERAS_REPOSICION_STOCK_MS = [2000, 6000];
+
 @Component({
   selector: 'app-auditoria',
   standalone: true,
@@ -112,6 +117,11 @@ export class AuditoriaComponent {
     });
     this.inventarioApi.listarLocales().subscribe({ next: (l) => this.locales.set(l) });
     this.inventarioApi.listarCategorias().subscribe({ next: (c) => this.categorias.set(c) });
+  }
+
+  // Vuelve a pedir solo los productos (con su stock actual), sin tocar locales ni categorías.
+  private refrescarStock() {
+    this.inventarioApi.listarProductos().subscribe({ next: (p) => this.productos.set(p) });
   }
 
   actualizarCampo<K extends keyof FormularioProducto>(campo: K, valor: FormularioProducto[K]) {
@@ -212,7 +222,10 @@ export class AuditoriaComponent {
   cancelarVenta(pedido: PedidoApi) {
     if (!confirm(`¿Cancelar el pedido #${pedido.id}? Esta acción no se puede deshacer.`)) return;
     this.pedidosApi.cancelar(pedido.id).subscribe({
-      next: () => this.cargarVentas(),
+      next: () => {
+        this.cargarVentas();
+        ESPERAS_REPOSICION_STOCK_MS.forEach(espera => setTimeout(() => this.refrescarStock(), espera));
+      },
       error: (err) => this.errorVentas.set(
         err.status === 409
           ? 'No se puede cancelar un pedido que ya fue entregado.'
